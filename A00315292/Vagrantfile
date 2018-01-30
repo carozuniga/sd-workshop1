@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.ssh.insert_key = false
+  config.vm.define :centos_server do |server|
+    server.vm.box = "centos1706_v0.2.0"
+    server.vm.network :private_network, ip: "192.168.33.10"
+    server.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "2048","--cpus", "8", "--name", "centos_webserver" ]
+    end
+    server.vm.provision "shell", inline: <<-SHELL
+      sudo yum install -y httpd
+      cp /vagrant/index.html /var/www/html
+      systemctl start  httpd.service
+      systemctl enable httpd.service
+    SHELL
+  end
+end
