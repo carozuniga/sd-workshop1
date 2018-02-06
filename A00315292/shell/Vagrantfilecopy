@@ -11,6 +11,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     server.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--memory", "2048","--cpus", "8", "--name", "centos_webserver" ]
     end
-    server.vm.provision "shell", path: "script.sh"
+    server.vm.provision "shell", inline: <<-SHELL
+      sudo yum install -y httpd
+      cp /vagrant/index.html /var/www/html
+      systemctl start  httpd.service
+      systemctl enable httpd.service
+    SHELL
   end
 end
